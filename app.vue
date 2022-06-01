@@ -23,17 +23,42 @@
         </div>
       </div>
       <div class="mt-20">
-        <input type="text" class="w-1/2 h-10" placeholder="Search a city..." />
-        <button class="bg-sky-400 w-20 text-white h-10">Search</button>
+        <input
+          type="text"
+          class="w-1/2 h-10"
+          placeholder="Search a city..."
+          v-model="input"
+        />
+        <button class="bg-sky-400 w-20 text-white h-10" @click="handleClick">
+          Search
+        </button>
       </div>
     </div>
+    {{ search }}
   </div>
 </template>
 
 <script setup lang="ts">
-const { data: city, error } = useFetch(
-  "https://api.openweathermap.org/data/2.5/weather?q=Dubai&units=metric&appid=fa847feedd1e1b63e4e28cc46441e268"
-);
+const search = ref("Toronto");
+const input = ref("");
+
+// const { data: city, error } = useFetch(
+//   () =>
+//     `https://api.openweathermap.org/data/2.5/weather?q=${search.value}&units=metric&appid=fa847feedd1e1b63e4e28cc46441e268`
+// );
+
+const { data: city, error } = useAsyncData("city", async() => {
+  const response = await $fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${search.value}&units=metric&appid=fa847feedd1e1b63e4e28cc46441e268`
+  );
+  return response;
+})
+
+const handleClick = () => {
+  const formatedSearch = input.value.trim().split(" ").join("+");
+  search.value = formatedSearch;
+  input.value = "";
+};
 </script>
 
 <style scoped>
