@@ -2,16 +2,21 @@
   <div class="h-screen relative overflow-hidden">
     <img :src="background" class="h-full w-full object-cover" />
     <div class="absolute w-full h-full top-0 overlay" />
-    <div class="absolute w-full h-full top-0 p-48" v-if="city">
-      <div class="flex justify-between">
-        <div>
-          <h1 class="text-7xl text-white">{{ city.name }}</h1>
-          <p class="font-extralight text-2xl mt-2 text-white">
-            Wednesay June 1st
-          </p>
+    <div
+      class="absolute w-full h-full top-0 pt-10 px-10 sm:px-14 md:px-28 lg:px-48"
+      v-if="city"
+    >
+      <div class="flex flex-col sm:flex-row justify-between text-center">
+        <div class="flex sm:block items-center">
+          <div>
+            <h1 class="text-7xl text-white">{{ city.name }}</h1>
+            <p class="font-extralight text-2xl mt-2 text-white">
+              {{ today }}
+            </p>
+          </div>
           <img
             :src="`https://openweathermap.org/img/wn/${city.weather[0].icon}@4x.png`"
-            class="w-56 icon"
+            class="w-24 sm:w-56 icon"
           />
         </div>
         <div>
@@ -34,7 +39,12 @@
     </div>
     <div v-else class="absolute w-full h-full top-0 p-48">
       <h1 class="text-7xl">OOps, we Can't Find City</h1>
-      <button class="mt-5 bg-sky-400 px-10 w-50 text-white h-10" @click="goBack">Go Back</button>
+      <button
+        class="mt-5 bg-sky-400 px-10 w-50 text-white h-10"
+        @click="goBack"
+      >
+        Go Back
+      </button>
     </div>
   </div>
 </template>
@@ -70,7 +80,7 @@ const { data: city, error } = useAsyncData(
         }
       );
 
-      cookie.value =search.value
+      cookie.value = search.value;
 
       const temp = response.main.temp;
 
@@ -96,6 +106,15 @@ const { data: city, error } = useAsyncData(
   }
 );
 
+let today = new Date();
+
+today = today.toLocaleDateString("en-US", {
+  weekday: "long",
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
 const handleClick = () => {
   const formatedSearch = input.value.trim().split(" ").join("+");
   search.value = formatedSearch;
@@ -113,5 +132,10 @@ const goBack = () => {
 .icon {
   margin-left: -2.75rem;
   margin-top: -2.75rem;
+}
+@media (max-width: 640px) {
+  .icon {
+  margin: 0;
+}
 }
 </style>
