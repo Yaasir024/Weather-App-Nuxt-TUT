@@ -1,8 +1,8 @@
 <template>
   <div class="h-screen relative overflow-hidden">
-    <img :src="background" />
+    <img :src="background" class="h-full w-full object-cover" />
     <div class="absolute w-full h-full top-0 overlay" />
-    <div class="absolute w-full h-full top-0 p-48">
+    <div class="absolute w-full h-full top-0 p-48" v-if="city">
       <div class="flex justify-between">
         <div>
           <h1 class="text-7xl text-white">{{ city.name }}</h1>
@@ -32,11 +32,16 @@
         </button>
       </div>
     </div>
+    <div v-else class="absolute w-full h-full top-0 p-48">
+      <h1 class="text-7xl">OOps, we Can't Find City</h1>
+      <button class="mt-5 bg-sky-400 px-10 w-50 text-white h-10" @click="goBack">Go Back</button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 const cookie = useCookie("city");
+const config = useRuntimeConfig();
 
 if (!cookie.value) cookie.value = "Tokyo";
 
@@ -56,7 +61,13 @@ const { data: city, error } = useAsyncData(
 
     try {
       response = await $fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${search.value}&units=metric&appid=fa847feedd1e1b63e4e28cc46441e268`
+        `https://api.openweathermap.org/data/2.5/weather?q=${search.value}`,
+        {
+          params: {
+            units: "metric",
+            appid: config.WEATHER_APP_SECRET,
+          },
+        }
       );
 
       cookie.value =search.value
@@ -89,6 +100,9 @@ const handleClick = () => {
   const formatedSearch = input.value.trim().split(" ").join("+");
   search.value = formatedSearch;
   input.value = "";
+};
+const goBack = () => {
+  search.value = cookie.value;
 };
 </script>
 
